@@ -24,6 +24,10 @@ export default function TimerPage(): JSX.Element {
     setScene('play')
   }
 
+  useEffect(() => {
+    document.title = 'Timer'
+  }, [])
+
   switch (scene) {
     case 'init':
       return <SceneInit onStart={handleClickStart} />
