@@ -7,7 +7,8 @@ export class Timer {
   private onTickSecond: (second: number) => void
 
   private turnIdx: number = 0
-  private isPause: boolean = false
+  private currentSecond: number = 0
+  private intervalFunc: number = 0
 
   constructor() {
     this.dataSteps = []
@@ -23,54 +24,51 @@ export class Timer {
     this.dataSteps = arg.data
     this.onNextTurn = arg.onNextTurn
     this.onTickSecond = arg.onTickSecond
+
+    this.currentSecond = arg.data[0]?.duration + 1 || 0
   }
 
   pause() {
-    this.isPause = true
+    clearInterval(this.intervalFunc)
   }
 
   continue() {
-    this.isPause = false
+    this.startTimer()
+  }
+
+  reset() {
+    this.pause()
+
+    const second = this.dataSteps[this.turnIdx].duration
+    this.currentSecond = second
+    this.onTickSecond(second)
   }
 
   async run() {
-    let i = 0
-
-    while (true) {
-      await this.timer()
-
-      i++
-      if (i >= this.dataSteps.length) {
-        i = 0
-      }
-      this.turnIdx = i
-
-      // intermediate timer
-
-      this.onNextTurn(i, this.dataSteps[i])
-    }
+    this.startTimer()
   }
 
-  private async timer() {
-    const currentStep = this.dataSteps[this.turnIdx]
+  private async startTimer() {
+    clearInterval(this.intervalFunc)
 
-    for (let i = currentStep.duration; i >= 0; i--) {
-      // for pause case, then will try to check every second is continued or not
-      if (this.isPause) {
-        while (true) {
-          await this.timeout(1)
-          if (!this.isPause) {
-            break
-          }
+    this.intervalFunc = setInterval(() => {
+      let second = this.currentSecond - 1
+
+      if (second < 0) {
+        let nextTurnIdx = this.turnIdx + 1
+
+        if (nextTurnIdx > this.dataSteps.length - 1) {
+          nextTurnIdx = 0
         }
+
+        this.turnIdx = nextTurnIdx
+        this.onNextTurn(nextTurnIdx, this.dataSteps[nextTurnIdx])
+
+        second = this.dataSteps[nextTurnIdx].duration
       }
 
-      this.onTickSecond(i)
-      await this.timeout(1)
-    }
-  }
-
-  private async timeout(second: number) {
-    return new Promise(resolve => setTimeout(resolve, second * 1000))
+      this.onTickSecond(second)
+      this.currentSecond = second
+    }, 1000)
   }
 }

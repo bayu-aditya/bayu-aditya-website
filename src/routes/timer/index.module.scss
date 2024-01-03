@@ -9,18 +9,4 @@
     width: 100%;
     padding: 5px;
   }
-
-  circle {
-    animation: countdownanimation 10s linear;
-    color: white;
-  }
-}
-
-@keyframes countdownanimation {
-  from {
-    stroke-dashoffset: 0px;
-  }
-  to {
-    stroke-dashoffset: 151px;
-  }
 }

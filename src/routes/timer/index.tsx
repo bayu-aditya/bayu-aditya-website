@@ -7,8 +7,8 @@ import styles from './index.module.scss'
 import { Tdata, TdataStep } from './types'
 
 export default function TimerPage(): JSX.Element {
-  const data = useRef<Tdata>({ ...emptyData })
-  // const data = useRef<Tdata>({
+  const dataRef = useRef<Tdata>({ ...emptyData })
+  // const dataRef = useRef<Tdata>({
   //   steps: [
   //     { name: 'Orang Pertama', duration: 10 },
   //     { name: 'Orang Kedua', duration: 5 },
@@ -20,7 +20,7 @@ export default function TimerPage(): JSX.Element {
   const [scene, setScene] = useState<Tscene>('init')
 
   const handleClickStart = (reqData: Tdata) => {
-    data.current = reqData
+    dataRef.current = reqData
     setScene('play')
   }
 
@@ -32,7 +32,7 @@ export default function TimerPage(): JSX.Element {
     case 'init':
       return <SceneInit onStart={handleClickStart} />
     case 'play':
-      return <ScenePlay data={data.current} />
+      return <ScenePlay data={dataRef.current} />
   }
 }
 
@@ -153,8 +153,8 @@ const ScenePlay: FC<{ data: Tdata }> = props => {
 
   const [turnIdx, setTurnIdx] = useState(0)
   const [second, setSecond] = useState(0)
-  const [isPause, setIsPause] = useState(false)
-  const [duration, setDuration] = useState(0)
+  const [isPause, setIsPause] = useState(true)
+  const [duration, setDuration] = useState(data.steps[0]?.duration || 0)
 
   useEffect(() => {
     timer.insertData({
@@ -165,7 +165,7 @@ const ScenePlay: FC<{ data: Tdata }> = props => {
       },
       onTickSecond: sec => setSecond(sec),
     })
-    timer.run()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -173,9 +173,15 @@ const ScenePlay: FC<{ data: Tdata }> = props => {
     setIsPause(true)
     timer.pause()
   }
+
   const handleContinue = () => {
     setIsPause(false)
     timer.continue()
+  }
+
+  const handleReset = () => {
+    setIsPause(true)
+    timer.reset()
   }
 
   return (
@@ -194,13 +200,14 @@ const ScenePlay: FC<{ data: Tdata }> = props => {
         <ProgressCircle duration={duration} second={second} />
         <div className="absolute top-[80px] text-4xl">{second}</div>
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-3">
         <button onClick={handlePause} hidden={isPause}>
           Pause
         </button>
         <button onClick={handleContinue} hidden={!isPause}>
           Continue
         </button>
+        <button onClick={handleReset}>Reset</button>
       </div>
     </div>
   )
@@ -214,7 +221,15 @@ const ProgressCircle: FC<{ duration: number; second: number }> = props => {
   const dashOffset = dashArray * ((duration - second) / duration)
 
   return (
-    <svg width="200" height="200" viewBox="-25 -25 250 250">
+    <svg
+      width="200"
+      height="200"
+      viewBox="-25 -25 250 250"
+      style={{
+        transform: 'rotate(-90deg)',
+        transformOrigin: 'center',
+      }}
+    >
       <circle
         r={radius}
         cx="100"
@@ -230,8 +245,12 @@ const ProgressCircle: FC<{ duration: number; second: number }> = props => {
         fill="transparent"
         stroke="green"
         strokeWidth="12px"
+        strokeLinecap="round"
         strokeDasharray={`${dashArray}px`}
         strokeDashoffset={`${dashOffset}px`}
+        style={{
+          transition: '1s linear all',
+        }}
       />
     </svg>
   )
