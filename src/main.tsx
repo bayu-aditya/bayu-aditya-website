@@ -4,8 +4,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { TimerPage } from './pages'
 import Root from './routes/root'
-import TimerPage from './routes/timer'
 
 const router = createBrowserRouter([
   {

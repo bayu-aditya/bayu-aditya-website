@@ -1,12 +1,12 @@
 import clsx from 'clsx'
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, Suspense, useEffect, useRef, useState } from 'react'
 import { MdDeleteOutline } from 'react-icons/md'
 
 import { Timer } from './helper'
-import styles from './index.module.scss'
+import styles from './timer.module.scss'
 import { Tdata, TdataStep } from './types'
 
-export default function TimerPage(): JSX.Element {
+export default function TimerPageBody(): JSX.Element {
   const dataRef = useRef<Tdata>({ ...emptyData })
   // const dataRef = useRef<Tdata>({
   //   steps: [
@@ -28,12 +28,20 @@ export default function TimerPage(): JSX.Element {
     document.title = 'Timer'
   }, [])
 
-  switch (scene) {
-    case 'init':
-      return <SceneInit onStart={handleClickStart} />
-    case 'play':
-      return <ScenePlay data={dataRef.current} />
+  const body = () => {
+    switch (scene) {
+      case 'init':
+        return <SceneInit onStart={handleClickStart} />
+      case 'play':
+        return <ScenePlay data={dataRef.current} />
+    }
   }
+
+  return (
+    <Suspense fallback={<div>Memuat tampilan timer ...</div>}>
+      {body()}
+    </Suspense>
+  )
 }
 
 const SceneInit: FC<{ onStart: (data: Tdata) => void }> = props => {
