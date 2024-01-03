@@ -79,7 +79,7 @@ const SceneInit: FC<{ onStart: (data: Tdata) => void }> = props => {
   }
 
   return (
-    <div className={clsx(styles.page, 'w-screen p-2 flex justify-center')}>
+    <div className={clsx(styles.page, 'w-screen p-3 flex justify-center')}>
       <div className="justify-center">
         <div className="mb-6 text-center">Insert your steps and duration</div>
         <div>
@@ -112,7 +112,7 @@ const SceneInit: FC<{ onStart: (data: Tdata) => void }> = props => {
                     <input
                       placeholder="Duration"
                       type="number"
-                      value={item.duration}
+                      value={item.duration || undefined}
                       onChange={e =>
                         handleChange(i, 'duration', e.target.value)
                       }
@@ -185,12 +185,14 @@ const ScenePlay: FC<{ data: Tdata }> = props => {
   }
 
   return (
-    <div className="w-screen">
-      <div>
+    <div className="w-screen p-3">
+      <div className="mb-10">
         {data.steps.map((step, i) => (
           <div
             key={i}
-            className={clsx({ ['bg-white text-black']: i === turnIdx })}
+            className={clsx('px-3 text-lg', {
+              ['bg-white text-black font-bold py-3']: i === turnIdx,
+            })}
           >
             {step.name}
           </div>
