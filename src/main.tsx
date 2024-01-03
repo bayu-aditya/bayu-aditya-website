@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import { TimerPage } from './pages'
+import { MonopolyBankingPage, TimerPage } from './pages'
 import Root from './routes/root'
 
 const router = createBrowserRouter([
@@ -15,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: '/timer',
     element: <TimerPage />,
+  },
+  {
+    path: '/monopoly-banking',
+    element: <MonopolyBankingPage />,
   },
 ])
 
