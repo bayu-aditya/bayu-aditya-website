@@ -1,6 +1,18 @@
 .page {
   width: 100vw;
-  padding: 30px;
-  display: grid;
-  justify-content: center;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.appbar {
+  position: fixed;
+  top: 0;
+  padding: 10px 0;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 30px;
 }
