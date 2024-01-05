@@ -12,10 +12,18 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Install Dependencies
         run: pnpm install
+
       - name: Build
         run: pnpm build
+
       - name: Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
