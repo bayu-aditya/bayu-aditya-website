@@ -1,7 +1,10 @@
 .page {
+  margin: auto;
   width: 100vw;
+  max-width: 600px;
   padding: 10px;
   font-size: 14px;
+  position: relative;
 }
 
 .appbar {

@@ -18,55 +18,55 @@ export const mockData: {
   ],
   logs: [
     {
-      dateTime: new Date('2023-12-14T08:02:00Z'),
+      datetime: new Date('2023-12-14T08:02:00Z'),
       message: 'Player 3 pays Player 1: 100',
     },
     {
-      dateTime: new Date('2023-12-14T08:01:34Z'),
+      datetime: new Date('2023-12-14T08:01:34Z'),
       message: 'Player 2 pays Player 1: 400',
     },
     {
-      dateTime: new Date('2023-12-14T08:00:00Z'),
+      datetime: new Date('2023-12-14T08:00:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:59:00Z'),
+      datetime: new Date('2023-12-14T07:59:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:58:00Z'),
+      datetime: new Date('2023-12-14T07:58:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:57:00Z'),
+      datetime: new Date('2023-12-14T07:57:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:56:00Z'),
+      datetime: new Date('2023-12-14T07:56:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:55:00Z'),
+      datetime: new Date('2023-12-14T07:55:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:54:00Z'),
+      datetime: new Date('2023-12-14T07:54:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:53:00Z'),
+      datetime: new Date('2023-12-14T07:53:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:52:00Z'),
+      datetime: new Date('2023-12-14T07:52:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:51:00Z'),
+      datetime: new Date('2023-12-14T07:51:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
     {
-      dateTime: new Date('2023-12-14T07:50:00Z'),
+      datetime: new Date('2023-12-14T07:50:00Z'),
       message: 'Player 1 pays Player 2: 350',
     },
   ],

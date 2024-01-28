@@ -1,51 +1,42 @@
-import Cookie from 'js-cookie'
 import moment from 'moment'
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
+import { MdOutlineLogout } from 'react-icons/md'
 import { When } from 'react-if'
+import { useSearchParams } from 'react-router-dom'
 import Select from 'react-select'
 
 import { numberWithCommas } from '../../tools/format'
-import { generateRandomString } from '../../tools/random'
-import { mockData } from './mock'
+import { useScenePlay } from './hooks'
 import styles from './monopolybanking.module.scss'
-import { keyDeviceID, Tlog, Tplayer } from './types'
+import { MonopolyEngine } from './rest'
+import { Tscene } from './types'
 
 export default function MonopolyBankingSystemPageBody(): JSX.Element {
-  const [scene, setScene] = useState<Tscene>('play')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const scene = searchParams.get('scene')
 
   useEffect(() => {
     document.title = 'Monopoly Banking System'
 
     // set device id for monopoly banking identity
-    gettingDeviceID()
+    MonopolyEngine.getDeviceID()
   }, [])
 
-  const handleBack = () => setScene('init')
-  const handlePlay = () => setScene('play')
+  const handleChangeScene = (scene: string) => {
+    setSearchParams(prev => ({ ...prev, scene }))
+  }
 
   switch (scene) {
-    case 'init':
-      return <SceneInit onChangeScene={setScene} />
     case 'create':
-      return <SceneCreateRoom onBack={handleBack} onPlay={handlePlay} />
+      return <SceneCreateRoom onChangeScene={handleChangeScene} />
     case 'join':
-      return <SceneJoinRoom onBack={handleBack} onPlay={handlePlay} />
+      return <SceneJoinRoom onChangeScene={handleChangeScene} />
     case 'play':
       return <ScenePlay />
+    default:
+      return <SceneInit onChangeScene={handleChangeScene} />
   }
-}
-
-/* getting device id if exist, otherwise create it */
-function gettingDeviceID(): string {
-  let deviceID = Cookie.get(keyDeviceID)
-
-  // if not found, then set it
-  if (!deviceID) {
-    deviceID = generateRandomString(10)
-    Cookie.set(keyDeviceID, deviceID)
-  }
-
-  return deviceID
 }
 
 const SceneInit: FC<{ onChangeScene: (scene: Tscene) => void }> = props => {
@@ -63,45 +54,31 @@ const SceneInit: FC<{ onChangeScene: (scene: Tscene) => void }> = props => {
 }
 
 const SceneCreateRoom: FC<{
-  onBack: () => void
-  onPlay: () => void
+  onChangeScene: (scene: Tscene) => void
 }> = props => {
   const [data, setData] = useState<{
     initBalance: number
-    player: TnewPlayer
+    playerName: string
   }>({
     initBalance: 0,
-    player: { id: gettingDeviceID(), name: '' },
+    playerName: '',
   })
 
-  useEffect(() => {
-    // Prompt confirmation when reload page is triggered
-    window.onbeforeunload = () => ''
+  useEffect(preventReload, [])
 
-    // Unmount the window.onbeforeunload event
-    return () => {
-      window.onbeforeunload = null
-    }
-  }, [])
-
-  const handleBack = props.onBack
+  const handleBack = () => props.onChangeScene('init')
 
   const handleChangePlayer = (name: string) => {
-    setData(prev => ({ ...prev, player: { ...prev.player, name } }))
+    setData(prev => ({ ...prev, playerName: name }))
   }
 
   const handleChangeInitialBalance = (balance: number) => {
     setData(prev => ({ ...prev, initBalance: balance }))
   }
 
-  const handlePlay = () => {
-    const body = {
-      initial_balance: data.initBalance,
-      players: data.player,
-    }
-
-    console.log(body)
-    props.onPlay()
+  const handlePlay = async () => {
+    await MonopolyEngine.createRoom(data)
+    props.onChangeScene('play')
   }
 
   return (
@@ -125,7 +102,7 @@ const SceneCreateRoom: FC<{
           autoFocus
           placeholder="Name"
           className="w-full p-2"
-          value={data.player.name}
+          value={data.playerName}
           onChange={e => handleChangePlayer(e.target.value)}
         />
       </div>
@@ -136,39 +113,35 @@ const SceneCreateRoom: FC<{
   )
 }
 
-const SceneJoinRoom: FC<{ onBack: () => void; onPlay: () => void }> = props => {
-  const handleBack = props.onBack
+const SceneJoinRoom: FC<{ onChangeScene: (scene: Tscene) => void }> = props => {
+  const dataRef = useRef<{
+    playerName: string
+    roomID: string
+    roomPass: string
+  }>({ playerName: '', roomID: '', roomPass: '' })
 
-  const dataRef = useRef<{ name: string; pass: string }>({ name: '', pass: '' })
+  useEffect(preventReload, [])
 
-  useEffect(() => {
-    // Prompt confirmation when reload page is triggered
-    window.onbeforeunload = () => ''
-
-    // Unmount the window.onbeforeunload event
-    return () => {
-      window.onbeforeunload = null
-    }
-  }, [])
-
-  const handleJoin = () => {
-    const body = {
-      player_id: gettingDeviceID(),
-      name: dataRef.current.name,
-      pass: dataRef.current.pass,
-    }
-
-    console.log(body)
-    props.onPlay()
+  const handleJoin = async () => {
+    await MonopolyEngine.joinRoom(dataRef.current)
+    props.onChangeScene('play')
   }
 
-  const handleChange = (key: 'id' | 'pass', value: string) => {
+  const handleBack = () => props.onChangeScene('init')
+
+  const handleChange = (
+    key: 'playername' | 'roomid' | 'roompass',
+    value: string,
+  ) => {
     switch (key) {
-      case 'id':
-        dataRef.current.name = value
+      case 'playername':
+        dataRef.current.playerName = value
         break
-      case 'pass':
-        dataRef.current.pass = value
+      case 'roomid':
+        dataRef.current.roomID = value
+        break
+      case 'roompass':
+        dataRef.current.roomPass = value
         break
     }
   }
@@ -181,14 +154,19 @@ const SceneJoinRoom: FC<{ onBack: () => void; onPlay: () => void }> = props => {
       <div className="grid gap-y-3">
         <div className={styles.title}>Join Room</div>
         <input
-          placeholder="Room ID"
+          placeholder="Player Name"
           className="p-2"
-          onChange={e => handleChange('id', e.target.value)}
+          onChange={e => handleChange('playername', e.target.value)}
         />
         <input
-          placeholder="Pass"
+          placeholder="Room ID"
           className="p-2"
-          onChange={e => handleChange('pass', e.target.value)}
+          onChange={e => handleChange('roomid', e.target.value)}
+        />
+        <input
+          placeholder="Room Pass"
+          className="p-2"
+          onChange={e => handleChange('roompass', e.target.value)}
         />
         <button onClick={handleJoin}>Join</button>
       </div>
@@ -197,50 +175,50 @@ const SceneJoinRoom: FC<{ onBack: () => void; onPlay: () => void }> = props => {
 }
 
 const ScenePlay: FC = () => {
-  const [data] = useState<{
-    player: Tplayer
-    players: Tplayer[]
-    logs: Tlog[]
-  }>(mockData)
+  const {
+    roomID,
+    roomPass,
+    player,
+    players,
+    logs,
 
-  useEffect(() => {
-    // Prompt confirmation when reload page is triggered
-    window.onbeforeunload = () => ''
+    optionPaymentPlayer,
+    paymentMode,
+    setPaymentMode,
+    setPaymentTarget,
+    setPaymentAmount,
+    handlePayment,
 
-    // Unmount the window.onbeforeunload event
-    return () => {
-      window.onbeforeunload = null
-    }
-  }, [])
+    handleLeaveRoom,
+  } = useScenePlay()
 
-  const [paymentMode, setPaymentMode] = useState<
-    'none' | 'frombank' | 'tobank' | 'player'
-  >('none')
-
-  const optionPaymentPlayer: Array<{ value: string; label: string }> = useMemo(
-    () => data.players.map(e => ({ value: e.id, label: e.name })),
-    [data.players],
-  )
+  useEffect(preventReload, [])
 
   return (
     <div className={styles.page}>
-      <div className="text-center text-xl font-bold mb-1">
+      <div className="text-center text-lg font-bold mb-1">
         Monopoly Banking System
       </div>
       <div className="text-xs text-center mb-8">
-        Room ID: 12345 <br />
-        Pass: abcde
+        Room ID: {roomID} <br />
+        Pass: {roomPass}
       </div>
+      <button
+        className="absolute top-2 right-1 p-[10px]"
+        onClick={handleLeaveRoom}
+      >
+        <MdOutlineLogout />
+      </button>
       <div className="flex justify-between my-5">
-        <div>{data.player.name}</div>
-        <div>{numberWithCommas(data.player.balance)}</div>
+        <div>{player.name}</div>
+        <div>{numberWithCommas(player.balance)}</div>
       </div>
       <div className="my-5">
         <div className="font-bold text-lg mb-1">Opponents</div>
-        {data.players.map(player => (
+        {players.map(player => (
           <div
             key={player.id}
-            className="flex justify-between odd:bg-slate-700"
+            className="flex justify-between px-2 py-1 even:bg-slate-700"
           >
             <div>{player.name}</div>
             <div>{numberWithCommas(player.balance)}</div>
@@ -265,18 +243,19 @@ const ScenePlay: FC = () => {
           <button
             className="w-full col-span-2"
             hidden={paymentMode !== 'none'}
-            onClick={() => setPaymentMode('player')}
+            onClick={() => setPaymentMode('toplayer')}
           >
             Pay to Player
           </button>
         </div>
         <When condition={paymentMode !== 'none'}>
           <div className="grid gap-y-2">
-            <div hidden={paymentMode !== 'player'}>
+            <div hidden={paymentMode !== 'toplayer'}>
               <Select
                 isSearchable={false}
                 placeholder="Select player"
                 options={optionPaymentPlayer}
+                onChange={val => setPaymentTarget(val?.value || '')}
                 styles={{
                   control: provided => ({
                     ...provided,
@@ -306,9 +285,14 @@ const ScenePlay: FC = () => {
                 }}
               />
             </div>
-            <input placeholder="amount" type="number" className="p-2" />
+            <input
+              placeholder="amount"
+              type="number"
+              className="p-2"
+              onChange={e => setPaymentAmount(Number(e.target.value))}
+            />
             <div className="grid grid-cols-2 gap-x-2">
-              <button>Submit</button>
+              <button onClick={handlePayment}>Submit</button>
               <button onClick={() => setPaymentMode('none')}>Cancel</button>
             </div>
           </div>
@@ -316,11 +300,11 @@ const ScenePlay: FC = () => {
       </div>
       <div className="mt-5 w-full">
         <div className="font-bold text-lg mb-1">Logs</div>
-        <div className="h-[200px] overflow-y-scroll">
-          {data.logs.map((log, i) => (
-            <div key={i} className="mb-2 odd:bg-slate-700">
+        <div className="h-[350px] overflow-y-scroll">
+          {logs.map((log, i) => (
+            <div key={i} className="mb-2 px-2 py-1 odd:bg-slate-700">
               <div className="text-xs">
-                {moment(log.dateTime).format('yyyy-mm-DD HH:MM:SS')}
+                {moment(log.datetime, true).format('HH:mm:ss')}
               </div>
               <div>{log.message}</div>
             </div>
@@ -331,6 +315,12 @@ const ScenePlay: FC = () => {
   )
 }
 
-type Tscene = 'init' | 'create' | 'join' | 'play'
+const preventReload = () => {
+  // Prompt confirmation when reload page is triggered
+  window.onbeforeunload = () => ''
 
-type TnewPlayer = Pick<Tplayer, 'id' | 'name'>
+  // Unmount the window.onbeforeunload event
+  return () => {
+    window.onbeforeunload = null
+  }
+}
