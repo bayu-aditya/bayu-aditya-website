@@ -4,13 +4,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import { MonopolyBankingPage, TimerPage } from './pages'
-import Root from './routes/root'
+import { RootPage, MonopolyBankingPage, TimerPage } from './pages'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Root />,
+    element: <RootPage />,
   },
   {
     path: '/timer',

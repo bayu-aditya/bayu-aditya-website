@@ -1,0 +1,27 @@
+.appbar {
+  position: fixed;
+  top: 30px;
+  right: 50px;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 35px;
+}
+
+.about {
+  position: relative;
+  background-color: #4e4e4e;
+
+  &::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 45%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(/profile-picture.jpg);
+    right: 0px;
+    opacity: 0.27;
+  }
+}
