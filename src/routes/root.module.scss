@@ -1,12 +1,23 @@
 .appbar {
   position: fixed;
-  top: 30px;
-  right: 50px;
+  top: 0px;
   z-index: 10;
+  padding: 0 100px;
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  column-gap: 35px;
+  transition: all 0.5s;
+
+  & > div {
+    cursor: pointer;
+    padding: 15px 17px;
+    margin-bottom: 3px;
+
+    &:hover {
+      margin-bottom: 0;
+      border-bottom: 3px solid;
+    }
+  }
 }
 
 .about {
