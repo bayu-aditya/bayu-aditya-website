@@ -1,9 +1,10 @@
 import { FC } from 'react'
+import { useWindowScroll, useWindowSize } from 'react-use'
+
 import GithubIcon from '../assets/github-icon.svg'
 import LinkedinIcon from '../assets/linkedin-icon.svg'
 import MailIcon from '../assets/mail-icon.svg'
 import styles from './root.module.scss'
-import { useWindowScroll, useWindowSize } from 'react-use'
 
 const isDev = import.meta.env.DEV
 

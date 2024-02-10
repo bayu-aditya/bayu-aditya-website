@@ -5,7 +5,7 @@ import { MonopolyEngine } from './rest'
 import { Tlog, Tplayer, TstateStorage } from './types'
 
 export const useScenePlay = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const [, setSearchParams] = useSearchParams()
   const stateRef = useRef<TstateStorage | null>()
 

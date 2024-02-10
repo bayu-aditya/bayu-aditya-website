@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import { RootPage, MonopolyBankingPage, TimerPage } from './pages'
+import { MonopolyBankingPage, RootPage, TimerPage } from './pages'
 
 const router = createBrowserRouter([
   {

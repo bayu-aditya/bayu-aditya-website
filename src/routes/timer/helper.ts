@@ -1,4 +1,4 @@
-/* eslint-disable no-constant-condition */
+ 
 import { TdataStep } from './types'
 
 export class Timer {
