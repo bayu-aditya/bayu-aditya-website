@@ -1,9 +1,17 @@
 import { FC } from 'react'
+import { Carousel } from 'react-responsive-carousel'
 import { useWindowScroll, useWindowSize } from 'react-use'
 
 import GithubIcon from '../assets/github-icon.svg'
 import LinkedinIcon from '../assets/linkedin-icon.svg'
 import MailIcon from '../assets/mail-icon.svg'
+import BizhubImage1 from '../assets/projects/bizhub-1.webp'
+import BizhubImage2 from '../assets/projects/bizhub-2.webp'
+import BizhubImage3 from '../assets/projects/bizhub-3.webp'
+import IdeatechImage1 from '../assets/projects/ideatech-1.webp'
+import IdeatechImage2 from '../assets/projects/ideatech-2.webp'
+import IdeatechImage3 from '../assets/projects/ideatech-3.webp'
+import IdeatechImage4 from '../assets/projects/ideatech-4.webp'
 import styles from './root.module.scss'
 
 const isDev = import.meta.env.DEV
@@ -15,6 +23,7 @@ export default function Root() {
       <About />
       <WorkingExperience />
       <Project />
+      <Education />
     </div>
   )
 }
@@ -119,38 +128,59 @@ const Project: FC = () => {
     >
       <div className="text-center text-[36px] font-bold">Project</div>
       {dataProjects.map(proj => (
-        <div key={proj.title} className="flex flex-col gap-y-[20px]">
-          <div>
-            <div className="text-[24px] font-bold">{proj.title}</div>
-            <div className="text-[20px]">{proj.subtitle}</div>
-          </div>
-          <div>{proj.desc}</div>
-          <div className="flex gap-[10px] flex-wrap text-[14px]">
-            {proj.stacks.map((stack, idx) => (
-              <div
-                key={idx}
-                className="border border-black rounded-full px-[15px] py-[8px]"
+        <div
+          key={proj.title}
+          className="flex gap-[30px] grid-cols-[50%,50%] odd:flex-row-reverse"
+        >
+          <div className="flex flex-col gap-y-[20px]">
+            <div>
+              <div className="text-[24px] font-bold">{proj.title}</div>
+              <div className="text-[20px]">{proj.subtitle}</div>
+            </div>
+            <div>{proj.desc}</div>
+            <div className="flex gap-[10px] flex-wrap text-[14px]">
+              {proj.stacks.map((stack, idx) => (
+                <div
+                  key={idx}
+                  className="border border-black rounded-full px-[15px] py-[8px]"
+                >
+                  {stack}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-x-[10px]">
+              <a
+                href={proj.link}
+                className="bg-[#4E4E4E] rounded-full w-min text-white whitespace-nowrap px-[20px] py-[9px]"
               >
-                {stack}
-              </div>
-            ))}
+                Visit Website
+              </a>
+              <a
+                href={proj.linkDetail}
+                className="bg-[#4E4E4E] rounded-full w-min text-white whitespace-nowrap px-[20px] py-[9px]"
+              >
+                See Details
+              </a>
+            </div>
           </div>
-          <div className="flex gap-x-[10px]">
-            <a
-              href={proj.link}
-              className="bg-[#4E4E4E] rounded-full w-min text-white whitespace-nowrap px-[20px] py-[9px]"
-            >
-              Visit Website
-            </a>
-            <a
-              href={proj.linkDetail}
-              className="bg-[#4E4E4E] rounded-full w-min text-white whitespace-nowrap px-[20px] py-[9px]"
-            >
-              See Details
-            </a>
+
+          <div>
+            <Carousel width="650px" autoPlay infiniteLoop>
+              {proj.images.map(image => (
+                <img key={image} src={image} className="rounded-[5px]" />
+              ))}
+            </Carousel>
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+const Education: FC = () => {
+  return (
+    <div hidden={!isDev} className="bg-[#F3F3F3] text-black p-[100px]">
+      <div className="text-center text-[36px] font-bold">Education</div>
     </div>
   )
 }
@@ -160,6 +190,7 @@ interface IProject {
   subtitle: string
   desc: string
   stacks: string[]
+  images: string[]
   link: string
   linkDetail: string
 }
@@ -179,6 +210,7 @@ const dataProjects: IProject[] = [
       'RabbitMQ',
       'InfluxDB',
     ],
+    images: [BizhubImage1, BizhubImage2, BizhubImage3],
     link: 'https://bizhub.kemnaker.go.id',
     linkDetail: '/',
   },
@@ -194,6 +226,7 @@ const dataProjects: IProject[] = [
       'NATS',
       'InfluxDB',
     ],
+    images: [IdeatechImage1, IdeatechImage2, IdeatechImage3, IdeatechImage4],
     link: 'https://www.ideatech.id',
     linkDetail: '/',
   },
@@ -202,6 +235,26 @@ const dataProjects: IProject[] = [
     subtitle: 'Personal Website',
     desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
     stacks: ['Kubernetes', 'Go', 'React Typescript', 'Vite', 'NATS'],
+    images: [],
+    link: '/monopoly-banking',
+    linkDetail: '/',
+  },
+  {
+    title:
+      'Calculation of Electronic Structure in Materials using Tight Binding Method Undergraduate Thesis - University of Indonesia',
+    subtitle: 'Undergraduate Thesis - University of Indonesia',
+    desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
+    stacks: ['Python', 'Fortran', 'CUDA', 'OpenMPI'],
+    images: [],
+    link: '/monopoly-banking',
+    linkDetail: '/',
+  },
+  {
+    title: 'AI Engineer Internship Project',
+    subtitle: 'Nodeflux',
+    desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry`s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
+    stacks: ['Python', 'OpenCV'],
+    images: [],
     link: '/monopoly-banking',
     linkDetail: '/',
   },
